@@ -40,7 +40,12 @@ var app = (function () {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/newpoint', function (eventbody) {
                 var event = JSON.parse(eventbody.body);
-                alert("X: "+event.x+", Y: "+event.y);
+                //alert("X: "+event.x+", Y: "+event.y);
+                var canvas = document.getElementById("canvas");
+                var ctx = canvas.getContext("2d");
+                ctx.beginPath();
+                ctx.arc(event.x, event.y, 3, 0, 2 * Math.PI);
+                ctx.stroke();
             });
         });
 
