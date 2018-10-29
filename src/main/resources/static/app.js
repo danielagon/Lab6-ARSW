@@ -18,8 +18,7 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
         //creando un objeto literal
-        alert(identifier);
-        stompClient.send("/topic/newpoint."+identifier, {}, JSON.stringify(point));
+        stompClient.send("/app/newpoint."+identifier, {}, JSON.stringify(point));
     };
     
     
