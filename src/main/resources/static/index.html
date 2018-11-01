@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
     
-    <body >
+    <body onload="app.init()">
         Identifier:<input id="id" type="number"/>
         <button onclick="app.connectById($('#id').val())" >Connect</button>
         X:<input id="x" type="number"/>
