@@ -6,9 +6,8 @@
 package edu.eci.arsw.collabpaint.controller;
 
 import edu.eci.arsw.collabpaint.model.Point;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,20 +24,27 @@ public class STOMPMessagesHandler {
 	@Autowired
 	SimpMessagingTemplate msgt;
         
-        private ConcurrentHashMap points = new ConcurrentHashMap();
-        private int cont = 0;
+        ConcurrentHashMap<String, CopyOnWriteArrayList<Point>> points = new ConcurrentHashMap<>();
     
 	@MessageMapping("/newpoint.{numdibujo}")    
 	public void handlePointEvent(Point pt,@DestinationVariable String numdibujo) throws Exception {
-		System.out.println("Nuevo punto recibido en el servidor!:"+pt);
-                cont++;
-                points.put(cont, pt);
-		msgt.convertAndSend("/topic/newpoint."+numdibujo, pt);
-                
-                if (points.size() == 4){
-                    msgt.convertAndSend("/topic/newpolygon."+numdibujo, points);
-                    cont = 0;
-                    points.clear();
+            
+            msgt.convertAndSend("/topic/newpoint."+numdibujo, pt);
+            
+            if (!points.containsKey(numdibujo)){
+                System.out.println("entra");
+                CopyOnWriteArrayList<Point> point = new CopyOnWriteArrayList<>();
+                point.add(pt);
+                points.put(numdibujo, point);
+                System.out.println("Puntos "+points.get(numdibujo));
+            }else{
+                points.get(numdibujo).add(pt);
+                //System.out.println("Puntos "+points.get(numdibujo));
+                if (points.get(numdibujo).size() >= 3){
+                    msgt.convertAndSend("/topic/newpolygon."+numdibujo, points.get(numdibujo));
+                    points.put(numdibujo, new CopyOnWriteArrayList<>());
                 }
+            }
+            //System.out.println("Nuevo punto recibido en el servidor!:"+pt);
 	}
 }

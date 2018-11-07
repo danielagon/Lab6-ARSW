@@ -18,8 +18,20 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
         //creando un objeto literal
-        stompClient.send("/topic/newpoint."+identifier, {}, JSON.stringify(point));
+        stompClient.send("/app/newpoint."+identifier, {}, JSON.stringify(point));
     };    
+    
+    var addPolygonToCanvas = function (points) {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (i in points){
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+        ctx.fill();
+    };
     
     var getMousePosition = function (evt) {
         canvas = document.getElementById("canvas");
@@ -45,6 +57,10 @@ var app = (function () {
                 //alert("X: "+event.x+", Y: "+event.y);
                 addPointToCanvas(event);
             });
+            stompClient.subscribe('/topic/newpolygon.'+identifier, function (eventbody){
+                var polygon = JSON.parse(eventbody.body);
+                addPolygonToCanvas(polygon);
+            });
         });
 
     };    
@@ -60,13 +76,10 @@ var app = (function () {
             connectAndSubscribe(id);
             
             $(can).click( function (e){
-                var pt = new Point(getMousePosition(e).x,getMousePosition(e).y);
+                var pt = getMousePosition(e);
                 console.info("publishing point at "+pt);
                 addPointToCanvas(pt);
-            });
-            
-            
-            
+            });            
         },
 
         publishPoint: function(px,py){
