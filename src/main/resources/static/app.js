@@ -18,7 +18,7 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
         //creando un objeto literal
-        stompClient.send("/app/newpoint."+identifier, {}, JSON.stringify(point));
+        stompClient.send("/topic/newpoint", {}, JSON.stringify(point));
     };
     
     var addPolygonToCanvas = function (points) {
@@ -57,11 +57,7 @@ var app = (function () {
             stompClient.subscribe('/topic/newpoint', function (eventbody) {
                 var event = JSON.parse(eventbody.body);
                 //alert("X: "+event.x+", Y: "+event.y);
-                var canvas = document.getElementById("canvas");
-                var ctx = canvas.getContext("2d");
-                ctx.beginPath();
-                ctx.arc(event.x, event.y, 3, 0, 2 * Math.PI);
-                ctx.stroke();
+                addPointToCanvas(event);
             });
         });
 
@@ -98,8 +94,12 @@ var app = (function () {
 
         init: function () {
             var can = document.getElementById("canvas");
+            can.setAttribute("width",screen.width);
+            
             $(can).click( function (e){
-                alert(getMousePosition(e).x);
+                var pt = new Point(getMousePosition(e).x,getMousePosition(e).y);
+                console.info("publishing point at "+pt);
+                addPointToCanvas(pt);
             });
             
             //websocket connection
