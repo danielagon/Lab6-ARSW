@@ -2,9 +2,10 @@
 ### Arquitecturas de Software - ARSW
 ### Laboratorio - Broker de Mensajes STOMP con WebSockets + HTML5 Canvas.
 
-#### Daniela González
+#### - Daniela González
 
-[Link de heroku](https://lab6-arsw.herokuapp.com/) 
+
+### - [Link de heroku](https://lab6-arsw.herokuapp.com/) 
 
 # Descripción arquitectura
 
