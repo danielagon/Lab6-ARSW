@@ -31,20 +31,17 @@ public class STOMPMessagesHandler {
             
             msgt.convertAndSend("/topic/newpoint."+numdibujo, pt);
             
-            if (!points.containsKey(numdibujo)){
-                System.out.println("entra");
-                CopyOnWriteArrayList<Point> point = new CopyOnWriteArrayList<>();
-                point.add(pt);
-                points.put(numdibujo, point);
-                System.out.println("Puntos "+points.get(numdibujo));
-            }else{
+            if (points.containsKey(numdibujo)){
                 points.get(numdibujo).add(pt);
-                //System.out.println("Puntos "+points.get(numdibujo));
-                if (points.get(numdibujo).size() >= 3){
+                if (points.get(numdibujo).size() >= 4){
                     msgt.convertAndSend("/topic/newpolygon."+numdibujo, points.get(numdibujo));
                     points.put(numdibujo, new CopyOnWriteArrayList<>());
                 }
+            }else{
+                CopyOnWriteArrayList<Point> point = new CopyOnWriteArrayList<>();
+                point.add(pt);
+                points.put(numdibujo, point);
             }
-            //System.out.println("Nuevo punto recibido en el servidor!:"+pt);
+            System.out.println("Nuevo punto recibido en el servidor!:"+pt);
 	}
 }

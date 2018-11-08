@@ -9,7 +9,7 @@ var app = (function () {
     
     var stompClient = null;
     
-    var identifier = 0;
+    var identifier = null;
 
     var addPointToCanvas = function (point) {        
         var canvas = document.getElementById("canvas");
@@ -18,7 +18,7 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
         //creando un objeto literal
-        stompClient.send("/app/newpoint."+identifier, {}, JSON.stringify(point));
+        
     };    
     
     var addPolygonToCanvas = function (points) {
@@ -29,7 +29,6 @@ var app = (function () {
         for (i in points){
             ctx.lineTo(points[i].x, points[i].y);
         }
-        ctx.closePath();
         ctx.fill();
     };
     
@@ -72,14 +71,13 @@ var app = (function () {
             var can = document.getElementById("canvas");
             can.setAttribute("width",screen.width);
             
-            //websocket connection
-            connectAndSubscribe(id);
-            
             $(can).click( function (e){
                 var pt = getMousePosition(e);
                 console.info("publishing point at "+pt);
-                addPointToCanvas(pt);
+                stompClient.send("/app/newpoint."+identifier, {}, JSON.stringify(pt));
             });            
+            //websocket connection
+            connectAndSubscribe(id);       
         },
 
         publishPoint: function(px,py){
